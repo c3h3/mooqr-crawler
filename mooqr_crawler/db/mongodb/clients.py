@@ -5,7 +5,11 @@ Created on Jul 4, 2014
 '''
 
 from pymongo import MongoClient
-from local_settings import MONGODB_URI
+try:
+    from local_settings import MONGODB_URI 
+except:
+    from mooqr_crawler.settings import MONGODB_URI
+    
 
 mongodb_cli = MongoClient(MONGODB_URI)
 
