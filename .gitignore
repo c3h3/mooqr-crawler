@@ -1,0 +1,6 @@
+.project
+.pydevproject
+coffeePhantom/
+dev_ipynbs/
+
+*local_settings.py
