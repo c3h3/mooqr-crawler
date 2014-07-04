@@ -3,4 +3,10 @@
 coffeePhantom/
 dev_ipynbs/
 
+build/
+dist/
+mooqr_crawler.egg-info/
+
+*.pyc
+
 *local_settings.py
