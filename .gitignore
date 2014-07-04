@@ -7,6 +7,7 @@ build/
 dist/
 mooqr_crawler.egg-info/
 
+*.json
 *.pyc
 
 *local_settings.py
