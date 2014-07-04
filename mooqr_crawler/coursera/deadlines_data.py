@@ -8,27 +8,38 @@ from coursera.coursera_dl import get_page
 import requests
 from pyquery import PyQuery
 from mooqr_crawler.db.mongodb.clients import coursera_deadlines
+from dateutil import parser
+import datetime
 
 
 def hg_asst_line_parser(S):
     parsing_results = {}
     label = S(".hg-asst-interval-label").text()
     if label == 'Results':
-        parsing_results["res_timestamp"] = S(".hg-asst-interval-available .hg-date").attr("data-livetimer-date-primitive")
+        parsing_results["res_timestamp"] = int(S(".hg-asst-interval-available .hg-date").attr("data-livetimer-date-primitive"))/1000.0
         parsing_results["res_time"] = S(".hg-asst-interval-available").text()
+        
+        parsing_results["res_datetime"] = datetime.datetime.fromtimestamp(parsing_results["res_timestamp"])
     
     elif label == 'Evaluation':
         parsing_results["eval_open"] = S(".hg-asst-interval-open").text()
         parsing_results["eval_close"] = S(".hg-asst-interval-close").text()
-        parsing_results["eval_open_timestamp"] = S(".hg-asst-interval-open .hg-date").attr("data-livetimer-date-primitive")
-        parsing_results["eval_close_timestamp"] = S(".hg-asst-interval-close .hg-date").attr("data-livetimer-date-primitive")
-    
+        parsing_results["eval_open_timestamp"] = int(S(".hg-asst-interval-open .hg-date").attr("data-livetimer-date-primitive"))/1000.0
+        parsing_results["eval_close_timestamp"] = int(S(".hg-asst-interval-close .hg-date").attr("data-livetimer-date-primitive"))/1000.0
+        
+        parsing_results["eval_open_datetime"] = datetime.datetime.fromtimestamp(parsing_results["eval_open_timestamp"])
+        parsing_results["eval_close_datetime"] = datetime.datetime.fromtimestamp(parsing_results["eval_close_timestamp"])
+        
     elif label == 'Submission':
         parsing_results["sub_open"] = S(".hg-asst-interval-open").text()
         parsing_results["sub_close"] = S(".hg-asst-interval-close").text()
-        parsing_results["sub_open_timestamp"] = S(".hg-asst-interval-open .hg-date").attr("data-livetimer-date-primitive")
-        parsing_results["sub_close_timestamp"] = S(".hg-asst-interval-close .hg-date").attr("data-livetimer-date-primitive")
+        parsing_results["sub_open_timestamp"] = int(S(".hg-asst-interval-open .hg-date").attr("data-livetimer-date-primitive"))/1000.0
+        parsing_results["sub_close_timestamp"] = int(S(".hg-asst-interval-close .hg-date").attr("data-livetimer-date-primitive"))/1000.0
     
+        parsing_results["sub_open_datetime"] = datetime.datetime.fromtimestamp(parsing_results["sub_open_timestamp"])
+        parsing_results["sub_close_datetime"] = datetime.datetime.fromtimestamp(parsing_results["sub_close_timestamp"])
+        
+        
     return parsing_results.items()
     
 
@@ -51,12 +62,17 @@ def assignment_item_deadline_parser(S):
     parsing_results["softdeadline"]["times"] = SS("time").attr("data-event-times")
     parsing_results["softdeadline"]["time_str"] = SS("time").text()
     
+    parsing_results["softdeadline"]["datetime"] = parser.parse(parsing_results["softdeadline"]["time_str"])
+    
+
     HS = S(".course-assignment-item-harddeadline")
     parsing_results["harddeadline"]["title"] = HS("time").attr("data-event-title")
     parsing_results["harddeadline"]["location"] = HS("time").attr("data-event-location")
     parsing_results["harddeadline"]["desc"] = HS("time").attr("data-event-description")
     parsing_results["harddeadline"]["times"] = HS("time").attr("data-event-times")
     parsing_results["harddeadline"]["time_str"] = HS("time").text()
+
+    parsing_results["harddeadline"]["datetime"] = parser.parse(parsing_results["harddeadline"]["time_str"])
     
     return parsing_results
     
@@ -77,12 +93,16 @@ def quiz_item_deadline_parser(S):
     parsing_results["softdeadline"]["times"] = SS("time").attr("data-event-times")
     parsing_results["softdeadline"]["time_str"] = SS("time").text()
     
+    parsing_results["softdeadline"]["datetime"] = parser.parse(parsing_results["softdeadline"]["time_str"])
+    
     HS = S(".course-quiz-item-harddeadline")
     parsing_results["harddeadline"]["title"] = HS("time").attr("data-event-title")
     parsing_results["harddeadline"]["location"] = HS("time").attr("data-event-location")
     parsing_results["harddeadline"]["desc"] = HS("time").attr("data-event-description")
     parsing_results["harddeadline"]["times"] = HS("time").attr("data-event-times")
     parsing_results["harddeadline"]["time_str"] = HS("time").text()
+    
+    parsing_results["harddeadline"]["datetime"] = parser.parse(parsing_results["harddeadline"]["time_str"])
     
     return parsing_results
     
