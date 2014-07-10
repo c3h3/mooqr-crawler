@@ -45,7 +45,7 @@ def get_session_df(query={},fields={}):
 ###############################################
     
 def update_universities_db():
-    r = requests.get("https://api.coursera.org/api/catalog.v1/universities?id=1&fields=name,homeLink,banner,locationLat,locationLng")
+    r = requests.get("https://api.coursera.org/api/catalog.v1/universities?fields=name,homeLink,banner,locationLat,locationLng")
     universities_data = api_res_to_json(r.text)
     coursera_universities.drop()
     coursera_universities.insert(universities_data["elements"])
