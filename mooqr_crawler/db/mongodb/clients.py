@@ -6,16 +6,24 @@ Created on Jul 4, 2014
 
 from pymongo import MongoClient
 try:
-    from local_settings import MONGODB_URI 
+    from local_settings import MONGODB_URI, C3H3MONGOHQ_URI
 except:
-    from mooqr_crawler.settings import MONGODB_URI
+    from mooqr_crawler.settings import MONGODB_URI, C3H3MONGOHQ_URI
     
 
 mongodb_cli = MongoClient(MONGODB_URI)
-
+ 
 mooqr_crawler_db = mongodb_cli.coursera
 coursera_courses = mooqr_crawler_db.coursera_courses
 coursera_sessions = mooqr_crawler_db.coursera_sessions
 coursera_universities = mooqr_crawler_db.coursera_universities
 coursera_instructors = mooqr_crawler_db.coursera_instructors
 coursera_deadlines = mooqr_crawler_db.coursera_deadlines
+edx_deadlines = mooqr_crawler_db.edx_deadlines
+
+
+c3h3mongohq_cli = MongoClient(C3H3MONGOHQ_URI)
+mooqr_db = c3h3mongohq_cli.mooqr
+mooqr_courses = mooqr_db.courses
+
+

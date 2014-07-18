@@ -8,9 +8,13 @@ from coursera.coursera_dl import get_cookies_for_class,make_cookie_values,get_pa
 from local_settings import USER, PASSWORD
 import requests
 
-login_session = requests.Session()
-get_cookies_for_class(login_session, "db", None, USER, PASSWORD)
-login_session.cookie_values = make_cookie_values(login_session.cookies, "db")
+def get_login_session(user, password):
+    s = requests.Session()
+    get_cookies_for_class(s, "db", None, user, password)
+    s.cookie_values = make_cookie_values(login_session.cookies, "db")
+    return s
+    
 
+login_session = get_login_session(USER, PASSWORD)
 
 
