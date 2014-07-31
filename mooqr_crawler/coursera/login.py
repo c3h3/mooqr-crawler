@@ -15,6 +15,6 @@ def get_login_session(user, password):
     return s
     
 
-login_session = get_login_session(USER, PASSWORD)
-
-
+login_session = requests.Session()
+get_cookies_for_class(login_session, "db", None, USER, PASSWORD)
+login_session.cookie_values = make_cookie_values(login_session.cookies, "db")
