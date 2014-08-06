@@ -28,6 +28,9 @@ mooqr_db = c3h3mongohq_cli.mooqr
 if not WITH_METEOR:
     mooqr_courses = mooqr_db.courses
     mooqr_sessions = mooqr_db.sessions
+    mooqr_course_events = mooqr_db.courseEvents
+    mooqr_course_tasks = mooqr_db.courseTasks
+    
     coursera_courses = mooqr_db.coursera_courses
     coursera_sessions = mooqr_db.coursera_sessions
     coursera_universities = mooqr_db.coursera_universities
@@ -37,7 +40,10 @@ if not WITH_METEOR:
 else:
     meteor_db = c3h3mongohq_cli.meteor
     mooqr_courses = meteor_db.courses
-    mooqr_sessions = mooqr_db.sessions
+    mooqr_sessions = meteor_db.sessions
+    mooqr_course_events = meteor_db.courseEvents
+    mooqr_course_tasks = meteor_db.courseTasks
+    
     coursera_courses = meteor_db.coursera_courses
     coursera_sessions = meteor_db.coursera_sessions
     coursera_universities = meteor_db.coursera_universities

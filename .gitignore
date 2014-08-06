@@ -11,3 +11,7 @@ mooqr_crawler.egg-info/
 *.pyc
 
 *local_settings.py
+
+bin/courseraDeadlines/node_modules/
+bin/courseraDeadlines/dataJsons/
+
