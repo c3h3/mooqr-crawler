@@ -14,6 +14,7 @@ from dateutil.parser import parse
 import ujson
 import re
 import numpy as np
+import traceback
 
 
 def create_new_id(collection, check_list=None):
@@ -52,19 +53,19 @@ DownloadedCoursesList = os.listdir(CourseraDeadlinePath)
 #################################################
 
 
-df = pd.DataFrame(list(clients.mooqr_sessions.find({},{'sessionLocalId':1, "courseId":1, "sid":1, "_id":0})))
- 
-def download_cli(cli_str):
-    print "[Executing] " + cli_str
-    cli_res = commands.getoutput(cli_str)
-    print "[Std Output] "
-    print cli_res
-    print "[Finished Executing] " + cli_str
-    return cli_res
-     
- 
- 
-cli_results = df["sessionLocalId"].map(lambda xx:"coffee getCourseraDeadlinesJSON.coffee %s %s" % (xx, CourseraDeadlinePath)).map(download_cli)
+# df = pd.DataFrame(list(clients.mooqr_sessions.find({},{'sessionLocalId':1, "courseId":1, "sid":1, "_id":0})))
+#  
+# def download_cli(cli_str):
+#     print "[Executing] " + cli_str
+#     cli_res = commands.getoutput(cli_str)
+#     print "[Std Output] "
+#     print cli_res
+#     print "[Finished Executing] " + cli_str
+#     return cli_res
+#      
+#  
+#  
+# cli_results = df["sessionLocalId"].map(lambda xx:"coffee getCourseraDeadlinesJSON.coffee %s %s" % (xx, CourseraDeadlinePath)).map(download_cli)
 
 #################################################
 
@@ -189,8 +190,11 @@ def update_session_events(one_sessionLocalId):
     for key in one_sessionLocalId_meta.keys():
         one_sessionLocalId_df[key] = one_sessionLocalId_meta[key]
     
-        
-    one_sessionLocalId_df = one_sessionLocalId_df.drop(["params","transparency","type"], axis=1)
+    for yy in ["params","transparency","type"]:
+        try:
+            one_sessionLocalId_df = one_sessionLocalId_df.drop(yy, axis=1)
+        except:
+            pass
 
     summary_decode = one_sessionLocalId_df["summary"].map(lambda xx:  re.match("(?P<eventTitle>[^(]*)\((?P<eventSubTitle>[^)]*)\)",xx).groupdict())
     one_sessionLocalId_df["eventTitle"] = summary_decode.map(lambda xx:xx["eventTitle"])
@@ -237,7 +241,16 @@ def update_session_events(one_sessionLocalId):
     print "[In update_session_events] Finished ... "
     
 
-map(update_session_events,DownloadedCoursesList)            
+def skip_update_session_events(one_sessionLocalId):
+    try:
+        update_session_events(one_sessionLocalId)
+    except Exception as e:
+        print "[Exception ... ]"
+        print e
+        print "[Traceback ... ]"
+        print traceback.format_exc()
+
+map(skip_update_session_events, DownloadedCoursesList)            
 
 
 
