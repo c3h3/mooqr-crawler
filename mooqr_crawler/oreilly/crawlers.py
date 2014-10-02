@@ -30,16 +30,19 @@ def get_chapters_and_sessions(one_book_page_url, output_type="json"):
                                                                                 map(filter_blanks_in_sessions,PyQuery(ee)("h4").map(lambda i,e:PyQuery(e).text()))
                                                                                 ))
     
+    short_description = PyQuery(S(".detail-description-content p")[0]).text()
+    
     if output_type=="list_of_tuple" :
-        return book_name, one_book_page_url, chapters_and_sessions
+        return book_name, one_book_page_url, chapters_and_sessions, short_description
     elif output_type=="json":
         return {"book_name":book_name, 
                 "page_url":one_book_page_url,
-                "chapters":map(lambda xx:{"chapter":xx[0],"sessions":xx[1]},chapters_and_sessions)}
+                "chapters":map(lambda xx:{"chapter":xx[0],"sessions":xx[1]},chapters_and_sessions),
+                "short_description":short_description}
         
 
         
-def insert_book_data_into_db(one_book_url, mongo_client, default_user_id = "pmHzynLotJqXLjTcz"):
+def insert_book_data_into_db(one_book_url, mongo_client, default_user_id = "YkCG3JY5ydGdCQP6u"):
     book_data = get_chapters_and_sessions(one_book_url)
     
     planId = "oreilly-" + book_data["page_url"].split("product/")[-1].split(".")[0]
@@ -47,9 +50,10 @@ def insert_book_data_into_db(one_book_url, mongo_client, default_user_id = "pmHz
 
 
     mongo_client.meteor.plans.remove({"_id":planId})
-    planId = mongo_client.meteor.plans.insert({"planName":book_data["book_name"],
+    planId = mongo_client.meteor.plans.insert({"planName":"[OReilly] "+ book_data["book_name"],
                                        "_id":planId,
-                                       "planUrl":book_data["page_url"],
+                                       "planLink":book_data["page_url"],
+                                       "planDescription":book_data["short_description"],
                                        "moduleIds" :[],
                                        "userId":default_user_id,
                                        "createAt":datetime.datetime.utcnow()})
@@ -93,11 +97,6 @@ def insert_book_data_into_db(one_book_url, mongo_client, default_user_id = "pmHz
             task_ids_list.append(session_id)
             
         mongo_client.meteor.modules.update({"_id":module_id},{"$push":{"taskIds":{"$each":task_ids_list}}})
-            
-        
-            
-            
-        
         
     
     mongo_client.meteor.plans.update({"_id":planId},{"$push":{"moduleIds":{"$each":module_ids_list}}})
